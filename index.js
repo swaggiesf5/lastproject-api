@@ -65,6 +65,15 @@ app.post('/authen', jsonParser, (req, res) => {
   }
 });
 
+app.post('/user', jsonParser, (req, res) => {
+  connection.query(
+    'SELECT * FROM user',
+    function(err, results,fields){
+      res.send(results)
+    }
+  )
+});
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
