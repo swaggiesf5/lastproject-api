@@ -65,7 +65,7 @@ app.post('/authen', jsonParser, (req, res) => {
   }
 });
 
-app.post('/user', jsonParser, (req, res) => {
+app.get('/user', jsonParser, (req, res) => {
   connection.query(
     'SELECT * FROM user',
     function(err, results,fields){
