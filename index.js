@@ -66,9 +66,6 @@ app.post('/SignUp', jsonParser, (req, res) => {
   });
 });
 
-
-
-
 // Sign in a user
 app.post('/SignIn', jsonParser, (req, res) => {
   const { email, password } = req.body;
@@ -110,6 +107,7 @@ app.get('/user', jsonParser, (req, res) => {
   )
 });
 
+
 app.get('/vaccine', jsonParser, (req, res) => {
   connection.query(
     'SELECT * FROM vaccine',
@@ -117,6 +115,123 @@ app.get('/vaccine', jsonParser, (req, res) => {
       res.send(results)
     }
   )
+});
+// Get a user by ID
+app.get('/user/:id', jsonParser, (req, res) => {
+  const userId = req.params.id;
+  connection.execute(
+    'SELECT * FROM `user` WHERE id = ?',
+    [userId],
+    function(err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.send(results);
+    }
+  );
+});
+
+// Get a vaccine by ID
+app.get('/vaccine/:id', jsonParser, (req, res) => {
+  const vaccineId = req.params.id;
+  connection.execute(
+    'SELECT * FROM `vaccine` WHERE id = ?',
+    [vaccineId],
+    function(err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.send(results);
+    }
+  );
+});
+
+
+app.delete('/user/:id', jsonParser, (req, res) => {
+  const userId = req.params.id;
+  connection.execute(
+    'DELETE FROM `user` WHERE id = ?',
+    [userId],
+    function(err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'User deleted successfully' });
+    }
+  );
+});
+
+// Update a user
+app.put('/user/:id', jsonParser, (req, res) => {
+  const userId = req.params.id;
+  const { id, idcard, fname, lname, email, pnumber, gender, date, password } = req.body;
+
+  connection.execute(
+    'UPDATE `user` SET id = ?, idcard = ?, fname = ?, lname = ?, email = ?, pnumber = ?, gender = ?, date = ?, password = ? WHERE id = ?',
+    [id, idcard, fname, lname, email, pnumber, gender, date, password, userId],
+    (err, results, fields) => {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'User updated successfully' });
+    }
+  );
+});
+
+// Delete a vaccine
+app.delete('/vaccine/:id', jsonParser, (req, res) => {
+  const vaccineId = req.params.id;
+  connection.execute(
+    'DELETE FROM `vaccine` WHERE id = ?',
+    [vaccineId],
+    function(err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'Vaccine deleted successfully' });
+    }
+  );
+});
+
+// Update a vaccine
+app.put('/vaccine/:id', jsonParser, (req, res) => {
+  const vaccineId = req.params.id;
+  const { id, hospital, vactype } = req.body;
+
+  connection.execute(
+    'UPDATE `vaccine` SET id = ?, hospital = ?, vactype = ? WHERE id = ?',
+    [id, hospital, vactype, vaccineId],
+    (err, results, fields) => {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'Vaccine updated successfully' });
+    }
+  );
+});
+
+// Update a vaccine's hospital and vactype
+app.put('/vaccine/:id', jsonParser, (req, res) => {
+  const vaccineId = req.params.id;
+  const { hospital, vactype } = req.body;
+
+  connection.execute(
+    'UPDATE `vaccine` SET hospital = ?, vactype = ? WHERE id = ?',
+    [hospital, vactype, vaccineId],
+    (err, results, fields) => {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'Vaccine updated successfully' });
+    }
+  );
 });
 
 
