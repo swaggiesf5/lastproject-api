@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 5000;
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const jwt = require('jsonwebtoken');
@@ -147,14 +147,29 @@ app.get('/vaccine/:id', jsonParser, (req, res) => {
     }
   );
 });
-
-
 app.delete('/user/:id', jsonParser, (req, res) => {
-  const userId = req.params.id;
+  const vaccineId = req.params.id;
   connection.execute(
     'DELETE FROM `user` WHERE id = ?',
-    [userId],
+    [vaccineId],
     function(err, results, fields) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'Vaccine deleted successfully' });
+    }
+  );
+});
+
+
+app.delete('/user/delete', jsonParser, (req, res) => {
+  const { id } = req.body;
+
+  connection.execute(
+    'DELETE FROM `user` WHERE id = ?',
+    [id],
+    (err, results, fields) => {
       if (err) {
         res.json({ status: 'error', message: err });
         return;
@@ -163,6 +178,7 @@ app.delete('/user/:id', jsonParser, (req, res) => {
     }
   );
 });
+
 
 // Update a user
 app.put('/user/:id', jsonParser, (req, res) => {
@@ -194,6 +210,22 @@ app.delete('/vaccine/:id', jsonParser, (req, res) => {
         return;
       }
       res.json({ status: 'OK', message: 'Vaccine deleted successfully' });
+    }
+  );
+});
+
+app.delete('/vaccine/delete', jsonParser, (req, res) => {
+  const { id } = req.body;
+
+  connection.execute(
+    'DELETE FROM `vaccine` WHERE id = ?',
+    [id],
+    (err, results, fields) => {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
+      res.json({ status: 'OK', message: 'User deleted successfully' });
     }
   );
 });
