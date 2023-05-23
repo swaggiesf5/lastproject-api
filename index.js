@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const secret = 'Fullstacken-Login';
 const cors = require('cors')
 
-//kuy
+
 
 
 require('dotenv').config();
@@ -20,18 +20,54 @@ app.use(cors())
 // Sign up a new user
 app.post('/SignUp', jsonParser, (req, res) => {
   const { id, idcard, fname, lname, email, pnumber, gender, date, password } = req.body;
-  connection.execute(
-    'INSERT INTO `user`(`id`, `idcard`, `fname`, `lname`, `email`, `pnumber`, `gender`, `date`, `password`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [id, idcard, fname, lname, email, pnumber, gender, date, password],
-    function(err, results, fields) {
-      if(err){
-        res.json({status:'error', message: err});
-        return;
-      }
-      res.send({status:'OK'});
+
+  connection.beginTransaction((err) => {
+    if (err) {
+      res.json({ status: 'error', message: err });
+      return;
     }
-  );
+
+    connection.execute(
+      'INSERT INTO `user`(`id`, `idcard`, `fname`, `lname`, `email`, `pnumber`, `gender`, `date`, `password`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, idcard, fname, lname, email, pnumber, gender, date, password],
+      (err, results, fields) => {
+        if (err) {
+          connection.rollback(() => {
+            res.json({ status: 'error', message: err });
+          });
+          return;
+        }
+
+        connection.execute(
+          'INSERT INTO `vaccine`(`id`, `hospital`, `vactype`) VALUES (?, "Default Hospital", "Default Vaccine")',
+          [id],
+          (err, results, fields) => {
+            if (err) {
+              connection.rollback(() => {
+                res.json({ status: 'error', message: err });
+              });
+              return;
+            }
+
+            connection.commit((err) => {
+              if (err) {
+                connection.rollback(() => {
+                  res.json({ status: 'error', message: err });
+                });
+                return;
+              }
+
+              res.send({ status: 'OK' });
+            });
+          }
+        );
+      }
+    );
+  });
 });
+
+
+
 
 // Sign in a user
 app.post('/SignIn', jsonParser, (req, res) => {
@@ -73,6 +109,19 @@ app.get('/user', jsonParser, (req, res) => {
     }
   )
 });
+
+app.get('/vaccine', jsonParser, (req, res) => {
+  connection.query(
+    'SELECT * FROM vaccine',
+    function(err, results,fields){
+      res.send(results)
+    }
+  )
+});
+
+
+
+
 
 
 app.listen(port, () => {
