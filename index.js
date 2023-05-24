@@ -347,7 +347,7 @@ app.put('/vaccine/hospital/:id', jsonParser, (req, res) => {
 });
 
 app.put('/vaccine/id/:id', jsonParser, (req, res) => {
-  const vaccineId = localStorage.getItem('id'); // Retrieve the id from localStorage
+  const vaccineId = localStorage.getItem('id'); 
   const { hospital, vactype } = req.body;
 
   connection.execute(
